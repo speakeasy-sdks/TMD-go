@@ -87,8 +87,8 @@ func WithClient(client HTTPClient) SDKOption {
 func New(opts ...SDKOption) *SDK {
 	sdk := &SDK{
 		_language:   "go",
-		_sdkVersion: "1.0.0",
-		_genVersion: "2.24.0",
+		_sdkVersion: "1.1.0",
+		_genVersion: "2.28.0",
 	}
 	for _, opt := range opts {
 		opt(sdk)
@@ -111,7 +111,6 @@ func New(opts ...SDKOption) *SDK {
 
 // GetUsers - Returns a list of users.
 // Optional extended description in CommonMark or HTML.
-
 func (s *SDK) GetUsers(ctx context.Context) (*operations.GetUsersResponse, error) {
 	baseURL := s._serverURL
 	url := strings.TrimSuffix(baseURL, "/") + "/users"
