@@ -3,10 +3,12 @@
 package sdk
 
 import (
+	"bytes"
 	"context"
 	"example/pkg/models/operations"
 	"example/pkg/utils"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -87,8 +89,8 @@ func WithClient(client HTTPClient) SDKOption {
 func New(opts ...SDKOption) *SDK {
 	sdk := &SDK{
 		_language:   "go",
-		_sdkVersion: "1.1.0",
-		_genVersion: "2.28.0",
+		_sdkVersion: "1.2.0",
+		_genVersion: "2.34.2",
 	}
 	for _, opt := range opts {
 		opt(sdk)
@@ -119,6 +121,8 @@ func (s *SDK) GetUsers(ctx context.Context) (*operations.GetUsersResponse, error
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("user-agent", fmt.Sprintf("speakeasy-sdk/%s %s %s", s._language, s._sdkVersion, s._genVersion))
 
 	client := s._defaultClient
 
@@ -129,7 +133,13 @@ func (s *SDK) GetUsers(ctx context.Context) (*operations.GetUsersResponse, error
 	if httpRes == nil {
 		return nil, fmt.Errorf("error sending request: no response")
 	}
-	defer httpRes.Body.Close()
+
+	rawBody, err := io.ReadAll(httpRes.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading response body: %w", err)
+	}
+	httpRes.Body.Close()
+	httpRes.Body = io.NopCloser(bytes.NewBuffer(rawBody))
 
 	contentType := httpRes.Header.Get("Content-Type")
 
@@ -143,7 +153,7 @@ func (s *SDK) GetUsers(ctx context.Context) (*operations.GetUsersResponse, error
 		switch {
 		case utils.MatchContentType(contentType, `application/json`):
 			var out []string
-			if err := utils.UnmarshalJsonFromResponseBody(httpRes.Body, &out); err != nil {
+			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out); err != nil {
 				return nil, err
 			}
 
