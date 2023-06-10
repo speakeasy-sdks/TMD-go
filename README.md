@@ -38,9 +38,9 @@ func main() {
 <!-- Start SDK Available Operations -->
 ## Available Resources and Operations
 
-### [SDK](docs/sdk/README.md)
+### [SDK](docs/sdks/sdk/README.md)
 
-* [GetUsers](docs/sdk/README.md#getusers) - Returns a list of users.
+* [GetUsers](docs/sdks/sdk/README.md#getusers) - Returns a list of users.
 <!-- End SDK Available Operations -->
 
 ### Maturity
